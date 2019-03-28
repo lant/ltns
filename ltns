@@ -63,6 +63,7 @@ def update(name):
     params = (name, )
     cursor = db.execute("UPDATE contacts set last_contact=date('now') where name = ?", params)
     db.commit()
+    db.close()
     if cursor.rowcount == 0:
         print("No contact with name \"{}\" was found on the db".format(name))
         sys.exit(1)
@@ -89,6 +90,7 @@ def add_new(name, last_contact):
         params = (name, last_contact,)
         db.cursor().execute("insert into contacts (name, last_contact) values (?, ?)", params)
         db.commit()
+        db.close()
     except sqlite3.IntegrityError:
         print("Could not add '{}' twice. It already exists in the db.".format(name))
 
