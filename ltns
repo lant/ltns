@@ -29,6 +29,19 @@ def create_db_file(dir, file):
     connection.commit()
     print("Done, saved db in: {}".format(str(dir+file)))
 
+def list_contacts():
+    db = get_db_connection()
+    query = "select * FROM contacts"
+    cursor = db.execute(query)
+    result = cursor.fetchall()
+    if result is None:
+        print("No tracked contacts yet")
+    else:
+        for c in result: 
+          name = str(c[0])
+          contact = str(c[1])
+          print("Contact {} was last contacted on {}".format(name, contact))
+    db.close()
 
 def get_random():
     db = get_db_connection()
@@ -97,6 +110,7 @@ def add_new(name, last_contact):
 
 parser = argparse.ArgumentParser()
 group = parser.add_mutually_exclusive_group()
+group.add_argument("--list", help="List all the contacts", action="store_true")
 group.add_argument("--add", type=str, help="Insert a new contact")
 group.add_argument("--oldest", help="Get the oldest non contacted contact", action="store_true")
 group.add_argument("--random", help="Get a random contact", action="store_true")
@@ -105,8 +119,8 @@ parser.add_argument("--last", type=str, help="last contacted date for this speci
 
 arguments = parser.parse_args()
 
-if arguments.oldest is False and arguments.random is False and arguments.update is None and arguments.add is None:
-    parser.error("You need to specify either `oldest` or `random` or `update` or `add`")
+if arguments.oldest is False and arguments.random is False and arguments.update is None and arguments.add is None and arguments.list is None:
+    parser.error("You need to specify either `oldest` or `random` or `update` or `add` or `list`")
 
 if arguments.oldest:
     get_oldest()
@@ -117,5 +131,8 @@ if arguments.random:
 if arguments.update:
     update(arguments.update)
 
+if arguments.list: 
+    list_contacts()
+  
 if arguments.add:
     add_new(arguments.add, arguments.last)
